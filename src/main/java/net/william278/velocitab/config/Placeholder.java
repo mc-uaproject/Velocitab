@@ -28,6 +28,7 @@ import net.william278.velocitab.Velocitab;
 import net.william278.velocitab.hook.miniconditions.MiniConditionManager;
 import net.william278.velocitab.player.TabPlayer;
 import net.william278.velocitab.tab.Nametag;
+import net.william278.velocitab.util.DefaultFontInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
@@ -130,6 +131,8 @@ public enum Placeholder {
     private final static String VEL_PLACEHOLDER = "<vel";
     private final static String VELOCITAB_PLACEHOLDER = "<velocitab_rel";
     private final static String ELSE_PLACEHOLDER = "ELSE";
+
+    private static int maxLength = 0;
 
     /**
      * Function to replace placeholders with a real value
@@ -273,8 +276,23 @@ public enum Placeholder {
                 }
             }
         }
-        return applyPlaceholders(text, parsed);
+        text = applyPlaceholders(text, parsed);
+        if (text.contains("%SPACE%")) {
+            int length = 0;
+            for (char c : text.replace("%SPACE%", "").toCharArray()) {
+                length += DefaultFontInfo.getDefaultFontInfo(c).getLength();
+            }
+            if (length > maxLength) {
+                maxLength = length;
+                text = text.replace("%SPACE%", "");
+            } else {
+                text = text.replace("%SPACE%", " ".repeat((int) Math.round((double) (maxLength - length) / DefaultFontInfo.getDefaultFontInfo(' ').getLength())));
+            }
+        }
+        return text;
     }
+
+    public static void resetMaxLength() { maxLength = 0; }
 
     public static CompletableFuture<String> replace(@NotNull String format, @NotNull Velocitab plugin,
                                                     @NotNull TabPlayer player) {

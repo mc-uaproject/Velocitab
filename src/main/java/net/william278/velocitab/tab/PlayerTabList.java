@@ -318,6 +318,7 @@ public class PlayerTabList {
     }
 
     protected void removePlayer(@NotNull Player target) {
+        Placeholder.resetMaxLength();
         removePlayer(target, null);
     }
 
