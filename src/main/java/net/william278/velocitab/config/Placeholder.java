@@ -280,7 +280,16 @@ public enum Placeholder {
         text = applyPlaceholders(text, parsed);
         if (text.contains("%SPACE%")) {
             int length = 0;
+            boolean skipNext = false;
             for (char c : text.replace("%SPACE%", "").toCharArray()) {
+                if (c == '&') {
+                    skipNext = true;
+                    continue;
+                }
+                if (skipNext) {
+                    skipNext = false;
+                    continue;
+                }
                 length += DefaultFontInfo.getDefaultFontInfo(c).getLength();
             }
             if (length > maxLength) {
